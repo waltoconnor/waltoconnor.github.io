@@ -21,6 +21,8 @@ From this example, you can see there is a loop consisting of four elements:
 
 There is actually a secret fifth element tacked on to element 1: you need some system to control the hardware device. These devices tend to be very rudimentary and inflexible, so a lot of trickery in configuring them and parsing the results is needed to actually leverage them. In this sense, part 1 actually has a separate hardware side and software side.
 
+![Diagram of the four elements of a complete dataplane telemetry system](/images/diagrams/four_telemetry_steps.svg)
+
 The dream for enterprise product development people is to get all four of these elements working together and selling it as a subscription service to their clients. Researchers are not product development engineers, and each of these chunks fall under different disciplines, so I am not aware of any cohesive project that brings these four parts together. That said, each component is being worked on:
 - The hardware for element 1 is being worked on by hardware companies like Broadcom (they have Broadscan) and Intel/Barefoot (they have Tofino, which is actually an FPGA but I'll gloss over that for now)
 - The software for element 1 is what I specialized in
@@ -32,7 +34,43 @@ The dream for enterprise product development people is to get all four of these 
 
 ### What do the dataplane systems look like in practice
 
+![Diagram of the most fundamental implementation of a telemetry collection system](/images/diagrams/basic_telem_syste.svg)
+
 There is a basic implementation of a dataplane telemetry system that everything seems to be a variant of: you have a big hash table somewhere, each time a packet arrives, some of its fields (e.g. Source IP, Destination IP, Source Port, Dest Port) are hashed to get a key to the hash table. Values from the packet (like byte count) are used to update the values for that packet's entry. This table is occasionally exported and wiped. Each row in this hash table corresponds to a *flow*, which is nominally the set of packets originating at one IP/Port combo destined for another IP/Port combo with a given protocol (a.k.a the *fivetuple*: SrcIP,DstIP,SrcPort,DstPort,Proto). The idea with the hash table is that by using these five fields as the hash key, you can have each row of the hash table correspond to a unique flow. Also note that you are free to use a subset of these keys, or include other things (think of using TCP Flags as a key so you group your packets by TCP flag). The key intuition is that you are grouping packets in to flows based on fields in the packet, and then taking aggregates over packets in a flow and reporting that.
+
+For example, consider a telemetry system grouping by Source IP and Destination Port (i.e. it uses SrcIP and DstPort as the hash key), and tracking number of packets in data slot 1 and number of bytes in data slot 2.
+
+Now imagine this system receives the following packets:
+
+<style>
+.tablelines table, .tablelines td, .tablelines th {
+        border: 1px solid rgba(0,0,0,0.5);
+        }
+</style>
+
+|---|---|---|---|---|---|---|
+|Packet|SrcIP|DstIP|SrcPort|DstPort|Protocol|SizeInBytes|
+|---|---|---|---|---|---|---|
+|Pkt1|1.2.3.4|10.0.2.5|80|54321|6|1500|
+|Pkt2|6.7.8.9|10.1.32.128|23232|22|6|96|
+|Pkt3|1.2.3.4|10.0.2.5|80|54321|6|1500|
+|Pkt4|1.2.3.4|10.0.2.5|80|54321|6|451|
+|Pkt5|6.7.8.9|10.1.5.25|33333|22|6|104|
+|---|---|---|---|---|---|---|
+{: .tablelines}
+
+After running these through the telemetry system with the hypothetical configuration described above, the contents of the hash table would look like:
+
+|---|---|---|
+|Key|Data 1 (Packet Count)|Data 2 (Byte Count)|
+|---|---|---|
+|1.2.3.4,54321|3|3451|
+|6.7.8.9,22|2|200|
+|---|---|---|
+{: .tablelines}
+
+Hopefully this simple example illustrates the value of having some system capable of taking packet data at line speed and aggregating it down to something much more manageable for the backend, which becomes extremely valuable as your line speed starts being measured in terabits per second and you start to get thousands of packets per second for each flow. This is a very elementary example, more robust systems can apply operations like min, max, average and many others; as well as extract more complex values from packets like TTL or inter packet times to use as operands. This opens up a whole world of possibility for what you can track efficiently.
+
 
 The dataplane telemetry system I have worked most extensively with is *Broadscan* by Broadcom. I have signed a very brutal NDA protecting anything technical about Broadscan, and engineers at Broadcom have been kind enough to share some of their most protected documentation with us and I don't want to make them regret that. As such in the future I will only describe Broadcom in the vaguest terms outside out things they have already approved us revealing in our previous publications.
 
