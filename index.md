@@ -9,6 +9,9 @@ feature_text: |
 
 Check out my [Github](https://github.com/waltoconnor)
 
+I have extensive experience with networking, distributed systems, and high performance computing.
+My other computer science interests include programming language theory, computer graphics, and embedded systems.
+
 ---
 #### Education  
 \
@@ -53,9 +56,9 @@ tbody tr:nth-child(odd) {
 | <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/csharp.svg"> **C#** | ★★★ |
 | <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/kotlin.png"> **Kotlin** | ★★★ |
 | <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/java.svg"> **Java** | ★★★ |
-| <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/elixir.svg"> **Elixir** | ★★★ |
-| <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/haskell.svg"> **Haskell** | ★ |
-| <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/ocaml.svg"> **OCaml** | ★★ |
+| <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/elixir.svg"> **Elixir** | ★★★★ |
+| <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/haskell.svg"> **Haskell** | ★★★ |
+| <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/ocaml.svg"> **OCaml** | ★★★ |
 | <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/r.svg"> **R** | ★★ |
 | <img style="width: 30px; height: 30px; vertical-align: middle;" src="/images/icons/bash.svg"> **Bash** | ★★★ |
 | <img style="width: 60px; height: 30px; vertical-align: middle;" src="/images/icons/sql.png"> **SQL** | ★★★★ |
